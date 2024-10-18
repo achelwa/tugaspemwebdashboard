@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin Blog marsella waty</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f2f6fa;
+        }
+        .card {
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 8px rgb(255, 104, 104);
+        }
+        .card:hover {
+            transform: scale(1.03);
+        }
+        .btn-warning {
+            transition: background-color 0.3s ease;
+        }
+        .btn-warning:hover {
+            background-color: #ff8db1;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+        }
+        table thead {
+            background-color: #550000;
+            color: rgb(255, 189, 212);
+        }
+        table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+        .modal-header {
+            background-color: #ffa8c3;
+            color: white;
+        }
+        .modal-footer .btn-secondary {
+            background-color: #7e0006;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Dashboard Admin Blog</h1>
+
+        <!-- Statistik -->
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-edit"></i> Jumlah Postingan
+                        </h5>
+                        <p class="card-text" id="jumlah-postingan">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-comments"></i> Jumlah Komentar
+                        </h5>
+                        <p class="card-text" id="jumlah-komentar">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-users"></i> Jumlah Pengunjung
+                        </h5>
+                        <p class="card-text" id="jumlah-pengunjung">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Postingan -->
+        <h2 class="mt-5">Daftar Postingan</h2>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Judul</th>
+                    <th>Ringkasan</th>
+                    <th>Tanggal Posting</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-postingan">
+                <!-- Daftar postingan akan ditampilkan di sini -->
+            </tbody>
+        </table>
+
+        <!-- Form Tambah Postingan -->
+        <h2 class="mt-5">Tambah Postingan Baru</h2>
+        <form id="form-tambah-postingan">
+            <div class="form-group">
+                <label for="judul">Judul Postingan</label>
+                <input type="text" class="form-control" id="judul" required>
+            </div>
+            <div class="form-group">
+                <label for="ringkasan">Ringkasan Konten</label>
+                <textarea class="form-control" id="ringkasan" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Tambah Postingan</button>
+        </form>
+    </div>
+
+    <!-- Modal Edit -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Postingan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+                <label for="editJudul">Judul Postingan</label>
+                <input type="text" class="form-control" id="editJudul" required>
+            </div>
+            <div class="form-group">
+                <label for="editRingkasan">Ringkasan Konten</label>
+                <textarea class="form-control" id="editRingkasan" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            <button type="button" class="btn btn-primary" id="saveEdit">Simpan Perubahan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+        // Simulasi data
+        let jumlahPostingan = 10;
+        let jumlahKomentar = 2;
+        let jumlahPengunjung = 10000000;
+        let editRow = null;
+
+        // Update statistik
+        document.getElementById('jumlah-postingan').innerText = jumlahPostingan;
+        document.getElementById('jumlah-komentar').innerText = jumlahKomentar;
+        document.getElementById('jumlah-pengunjung').innerText = jumlahPengunjung;
+
+        // Fungsi untuk mendapatkan tanggal saat ini
+        function getCurrentDate() {
+            const date = new Date();
+            return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+        }
+
+        // Menambahkan postingan baru
+        document.getElementById('form-tambah-postingan').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const judul = document.getElementById('judul').value;
+            const ringkasan = document.getElementById('ringkasan').value;
+            const tanggalPosting = getCurrentDate();
+            const tabel = document.getElementById('tabel-postingan');
+            const row = tabel.insertRow();
+            row.innerHTML = `<td>${jumlahPostingan + 1}</td><td>${judul}</td><td>${ringkasan}</td><td>${tanggalPosting}</td><td><button class="btn btn-warning btn-sm edit-btn" data-toggle="modal" data-target="#editModal">Edit</button></td>`;
+            jumlahPostingan++;
+            document.getElementById('jumlah-postingan').innerText = jumlahPostingan;
+            this.reset();
+        });
+
+        // Mengedit postingan
+        document.getElementById('tabel-postingan').addEventListener('click', function(e) {
+            if (e.target.classList.contains('edit-btn')) {
+                editRow = e.target.closest('tr');
+                document.getElementById('editJudul').value = editRow.cells[1].innerText;
+                document.getElementById('editRingkasan').value = editRow.cells[2].innerText;
+            }
+        });
+
+        // Simpan perubahan edit
+        document.getElementById('saveEdit').addEventListener('click', function() {
+            const newJudul = document.getElementById('editJudul').value;
+            const newRingkasan = document.getElementById('editRingkasan').value;
+            if (editRow) {
+                editRow.cells[1].innerText = newJudul;
+                editRow.cells[2].innerText = newRingkasan;
+                $('#editModal').modal('hide');
+            }
+        });
+    </script>
+</body>
+</html>
